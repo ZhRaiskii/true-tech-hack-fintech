@@ -1,0 +1,13 @@
+package ru.shsh.mtshack.models.entitys;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.Entity;
+
+@Entity
+@Getter
+@Setter
+public class SavingsAccount extends Account{
+
+}

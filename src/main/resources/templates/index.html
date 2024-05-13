@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МТС Банк</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+
+        .navbar {
+            background-color: #ff0018 !important;
+        }
+
+        .navbar-dark .navbar-brand {
+            color: #ffffff;
+        }
+        .navbar-nav .nav-link {
+            color: #ffffff !important; /* Начальный цвет текста - светло-серый */
+        }
+        .navbar-nav .nav-link:hover {
+            color: #ffffff; /* Цвет текста при наведении - белый */
+        }
+        .navbar-brand,
+        .navbar-nav .nav-link {
+            font-family: Arial, sans-serif; /* Шрифт Arial или любой другой sans-serif шрифт */
+            font-weight: bold; /* Жирное начертание */
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #ffffff;
+        }
+
+        .message-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message-bubble {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            max-width: 70%;
+        }
+
+        #chatModal .user-message {
+            background-color: #ec5555;
+            color: white;
+            align-self: flex-end;
+        }
+
+        #chatModal .server-message {
+            background-color: #d20303;
+            color: white;
+            align-self: flex-start;
+        }
+
+
+        .message-container {
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chatModal .message-bubble {
+            max-width: 50%;
+        }
+        @keyframes mic-blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        /* Медиа-запрос для мобильных устройств */
+        @media (max-width: 576px) {
+            .section {
+                padding: 20px; /* Уменьшаем внутренний отступ блока */
+            }
+        }
+        .containers {
+            margin-top: 50px; /* Отступ сверху */
+        }
+
+        .section {
+            background-color: #ffffff; /* Цвет фона блока */
+            padding: 30px; /* Внутренний отступ блока */
+            border-radius: 10px; /* Скругление углов блока */
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); /* Тень блока */
+            margin-bottom: 30px; /* Отступ снизу блока */
+        }
+
+        .section-title {
+            font-size: 24px; /* Размер заголовка блока */
+            font-weight: bold; /* Жирный текст */
+            margin-bottom: 20px; /* Отступ снизу заголовка блока */
+        }
+
+        .section-content {
+            font-size: 16px; /* Размер текста */
+            line-height: 1.6; /* Межстрочный интервал */
+            color: #333333; /* Цвет текста */
+        }
+
+        .btn-danger {
+            background-color: #ff0018; /* Цвет кнопки */
+            color: #ffffff; /* Цвет текста кнопки */
+            border: none; /* Убираем границу кнопки */
+            padding: 10px 20px; /* Внутренние отступы кнопки */
+            border-radius: 5px; /* Скругление углов кнопки */
+            font-size: 18px; /* Размер текста кнопки */
+            transition: all 0.3s ease; /* Плавное изменение свойств */
+        }
+
+        .btn-danger:hover {
+            background-color: #e60016; /* Цвет кнопки при наведении */
+        }
+    </style>
+</head>
+
+<body>
+<!-- Верхнее меню -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container">
+        <a class="navbar-brand" href="/">MTS Bank</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/accountsPage">Мои счета</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">История операций</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/paymentsAndTransfers">Платежи и переводы</a>
+                </li>
+
+                <!-- Проверка ролей пользователя -->
+                <li class="nav-item" th:if="${#httpServletRequest.isUserInRole('ROLE_USER') or #httpServletRequest.isUserInRole('ROLE_ADMIN')}">
+                    <a class="nav-link" href="/logout">Выход</a>
+                </li>
+                <li class="nav-item" th:unless="${#httpServletRequest.isUserInRole('ROLE_USER') or #httpServletRequest.isUserInRole('ROLE_ADMIN')}">
+                    <a class="nav-link" href="/login">Войти</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="containers">
+    <!-- Блок приветствия -->
+    <div class="section">
+        <h1 class="section-title">Добро пожаловать в МТС Банк</h1>
+        <p class="section-content">Это главная страница сайта МТС Банка. Чтобы открыть чат, нажмите кнопку ниже или скажите "<strong>привет мтс</strong>".</p>
+        <div class="text-right fixed-bottom mb-3 mr-3">
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#chatModal" aria-label="Открыть чат МТС Банк">
+                Открыть чат с МТС Банком
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal" id="chatModal">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+
+            <!-- Заголовок модального окна -->
+            <div class="modal-header">
+                <h4 class="modal-title">Чат с МТС Банком</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть окно">&times;</button>
+            </div>
+
+            <!-- Тело модального окна (здесь будет размещен чат) -->
+            <div class="modal-body">
+                <div class="message-container" id="modalMessageContainer" aria-live="polite" aria-atomic="true" aria-relevant="additions"></div>
+            </div>
+
+            <!-- Поле ввода сообщения -->
+            <div class="modal-footer">
+                <div class="input-group">
+                    <input type="text" id="messageInput" class="form-control" style="height: 50px;"
+                           placeholder="Введите сообщение..." aria-label="Поле ввода сообщения">
+
+                    <div class="input-group-append">
+                        <button onclick="sendMessage(document.getElementById('messageInput').value)"
+                                class="btn btn-primary" style="background-color: #e01527;" aria-label="Отправить сообщение"
+                        >Отправить
+                        </button>
+                        <!-- Кнопка записи голоса -->
+                        <button id="voiceButton" onclick="toggleVoiceRecording()"
+                                class="btn btn-secondary" style="background-color: #e01527;"
+                                aria-label="Запись голоса">
+                            <!-- Иконка микрофона Bootstrap -->
+                            <span id="micIcon" class="bi bi-mic" style="font-size: 1.5rem; visibility: visible; animation: mic-blink 1s infinite;"></span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Индикатор записи -->
+                <div class="recording-indicator" id="recordingIndicator" aria-live="assertive" role="status"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Подключение Bootstrap JS (необходимо для работы некоторых компонентов Bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    let recognition;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'ru-RU';
+
+        recognition.onstart = function () {
+            document.getElementById('recordingIndicator').style.display = 'block';
+        };
+
+        recognition.onresult = function (event) {
+            let text = event.results[0][0].transcript.toLowerCase();
+            sendMessage(text);
+            if (text.includes('привет мтс')) {
+                $('#chatModal').modal('show');
+                recognition.start();
+            } else if (text.includes('стоп мтс')) {
+                $('#chatModal').modal('hide');
+                recognition.start();
+            } else {
+
+            }
+        };
+
+        recognition.onerror = function (event) {
+            console.error('Произошла ошибка при распознавании речи:', event.error);
+        };
+
+        recognition.onend = function () {
+            document.getElementById('recordingIndicator').style.display = 'none';
+        };
+
+        recognition.start();
+
+        function sendMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            messageElement.classList.add('message-bubble', 'user-message');
+            document.getElementById('modalMessageContainer').appendChild(messageElement);
+
+            // Отправка результатов распознавания речи на сервер
+            $.ajax({
+                type: 'POST',
+                url: '/processMessage',
+                data: {
+                    text: message
+                },
+                success: function (response) {
+                    handleResponse(response);
+                    recognition.start();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Произошла ошибка при отправке на сервер:', status, error);
+                    recognition.start();
+                }
+            });
+        }
+        let isRecording = false;
+
+        function toggleVoiceRecording() {
+            const micIcon = document.getElementById('micIcon');
+            if (isRecording) {
+                recognition.stop();
+                isRecording = false;
+                micIcon.style.visibility = "visible";
+                micIcon.style.animationPlayState = "paused";
+            } else {
+                recognition.start();
+                isRecording = true;
+                micIcon.style.animationPlayState = "running";
+            }
+        }
+
+
+
+
+        function animateMic() {
+            const micIcon = document.getElementById('micIcon');
+            let isMicVisible = true;
+            const intervalId = setInterval(function () {
+                micIcon.style.visibility = isMicVisible ? 'visible' : 'hidden';
+                isMicVisible = !isMicVisible;
+            }, 500); // Интервал в миллисекундах для мигания микрофона
+
+            // Остановка мигания микрофона после окончания записи
+            recognition.onend = function () {
+                clearInterval(intervalId);
+                micIcon.style.visibility = 'visible'; // Возвращаем иконку микрофона в видимое состояние
+            };
+        }
+
+        function handleResponse(response) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = response;
+            messageElement.classList.add('message-bubble', 'server-message');
+            document.getElementById('modalMessageContainer').appendChild(messageElement);
+            document.getElementById('modalMessageContainer').scrollTop = document.getElementById(
+                'modalMessageContainer').scrollHeight;
+
+            if ($('#chatModal').hasClass('show')) {
+                let utterance = new SpeechSynthesisUtterance(response);
+                speechSynthesis.speak(utterance);
+            }
+
+            console.log('МТС банк: ', response);
+            recognition.start();
+        }
+    }
+</script>
+</body>
+
+</html>

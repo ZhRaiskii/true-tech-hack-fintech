@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои счета</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Пользовательские стили -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: #ff0018 !important;
+        }
+
+        .navbar-dark .navbar-brand {
+            color: #ffffff;
+        }
+        .navbar-nav .nav-link {
+            color: #ffffff !important; /* Начальный цвет текста - светло-серый */
+        }
+        .navbar-nav .nav-link:hover {
+            color: #ffffff; /* Цвет текста при наведении - белый */
+        }
+        .navbar-brand,
+        .navbar-nav .nav-link {
+            font-family: Arial, sans-serif; /* Шрифт Arial или любой другой sans-serif шрифт */
+            font-weight: bold; /* Жирное начертание */
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #ffffff;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #ff001c; /* Красный */
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .btn-create {
+            background-color: #ff0019; /* Красный */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            background-color: #ff0019; /* Красный */
+            color: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container">
+        <a class="navbar-brand" href="/">МТС Банк</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/accountsPage">Мои счета</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">История транзакций</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/paymentsAndTransfers">Платежи и переводы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Выйти</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="margin-top: 40px ">
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Мои счета</h3>
+        </div>
+        <div class="card-body">
+            <!-- Отображение главного счета пользователя -->
+            <div th:each="account, iterStat : ${accounts}" class="account-card mb-4">
+                <div th:if="${account.name == 'Main Account'}" class="card">
+                    <div class="card-header bg-dark text-light">
+                        <h5 class="mb-0">Главный счет</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <span>Номер счета: <span th:text="${account.id}"></span></span><br>
+                            <span th:text="${account.balance}" class="font-weight-bold"></span>
+                            <span th:text="${account.currencyType == 'YUAN' ? 'юан' : 'руб'}" class="font-weight-bold"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Отображение счетов пользователя -->
+            <div th:each="account, iterStat : ${accounts}" class="account-card mb-4">
+                <div class="card">
+                    <div class="card-header bg-dark text-light">
+                        <h5 class="mb-0" th:text="${account.name.toUpperCase()}"></h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <span th:text="'Номер счета: ' + ${account.id}"></span><br>
+                            <span th:text="${account.balance}" class="font-weight-bold"></span>
+                            <span th:text="${account.currencyType == 'YUAN' ? 'юан' : 'руб'}" class="font-weight-bold"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Кнопки для создания различных типов счетов -->
+            <button type="button" class="btn btn-create" data-toggle="modal" data-target="#modalCreateAccount" aria-label="Создать счет">Создать накопительный счет</button>
+
+            <!-- Модальное окно для выбора валюты -->
+            <div class="modal fade" id="modalCreateAccount" tabindex="-1" aria-labelledby="modalCreateAccountLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalCreateAccountLabel">Создание счета</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Форма для создания счета -->
+                            <form th:action="@{/accountsPage/createSavingsAccount}" method="post" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="accountName" class="form-label">Название</label>
+                                    <input type="text" class="form-control" id="accountName" name="accountName" required/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="accountCurrency" class="form-label">Тип валюты</label>
+                                    <select class="form-select" id="accountCurrency" name="accountCurrency" required>
+                                        <option value="RUBLE">Рубль</option>
+                                        <option value="DOLLAR">Доллар</option>
+                                        <option value="EURO">Евро</option>
+                                        <option value="YUAN">Юань</option>
+                                    </select>
+                                </div>
+                                <!-- Добавляем скрытое поле ввода, чтобы включить объект Principal -->
+                                <input type="hidden" name="username" th:value="${#httpServletRequest.userPrincipal.name}" />
+                                <button type="submit" class="btn btn-primary">Создать</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS, jQuery, Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

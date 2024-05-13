@@ -1,0 +1,115 @@
+
+body {
+    background-color: #e3dada;
+}
+
+.navbar {
+    background-color: #ff0018 !important;
+}
+
+.navbar-dark .navbar-brand {
+    color: #ffffff;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #ffffff;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #ffffff;
+}
+
+.message-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.message-bubble {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    max-width: 70%;
+}
+.card {
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #ff0018; /* Red */
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+.btn-create {
+    background-color: #ff0017; /* Red */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-header {
+    background-color: #ff0018; /* Red */
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+#chatModal .user-message {
+    background-color: #ff0000;
+    color: white;
+    align-self: flex-end;
+}
+
+#chatModal .server-message {
+    background-color: #911c1c;
+    color: white;
+    align-self: flex-start;
+}
+
+
+.message-container {
+    max-height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#chatModal .message-bubble {
+    max-width: 50%;
+}
+
+
+.recording-indicator {
+    position: absolute;
+    top: calc(50% - 10px);
+    right: 70px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #000;
+    border-radius: 50%;
+    animation: recording 1s infinite alternate;
+}
+
+
+@keyframes recording {
+    0% {
+        background-color: transparent;
+    }
+
+    100% {
+        background-color: red;
+    }
+}

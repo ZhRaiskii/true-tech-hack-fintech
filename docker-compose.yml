@@ -1,0 +1,31 @@
+services:
+  # Сервис с PostgreSQL
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: mtshack
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - mtshack_postgres_data:/var/lib/postgresql/data
+
+  # Сервис с вашим Java-приложением
+  mtshack-app:
+    image: mtshack-image2:latest
+    container_name: mtshack_container
+    restart: always
+    ports:
+      - "8090:8090"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mtshack
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345
+
+volumes:
+  mtshack_postgres_data:
