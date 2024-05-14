@@ -13,12 +13,17 @@ git clone https://git.codenrock.com/true-tech-hack-1150/cnrprod1714159195-team-6
 ```
 cd true-tech-hack-fintech
 ```
+Соберите проект при помощи Maven:
+```
+mvn clean install
 
+```
 Запустите Docker-контейнер:
 
 ```
 docker-compose up -d
 ```
+
 # Важно чтобы порт 8090 был не занят!!!
 После этого приложение будет доступно по адресу `http://localhost:8090`.
 
