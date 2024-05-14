@@ -3,7 +3,7 @@
 ### 1. Клонирование репозитория
 
 ```
-git clone https://git.codenrock.com/true-tech-hack-1150/cnrprod1714159195-team-68672/true-tech-hack-fintech
+git clone https://git.codenrock.com/true-tech-hack-1150/cnrprod1714159195-team-68672/true-tech-hack-fintech](https://github.com/ZhRaiskii/true-tech-hack-fintech.git
 ```
 
 ### 2. Установка и запуск с использованием Docker
@@ -16,7 +16,6 @@ cd true-tech-hack-fintech
 Соберите проект при помощи Maven:
 ```
 mvn clean install
-
 ```
 Запустите Docker-контейнер:
 
